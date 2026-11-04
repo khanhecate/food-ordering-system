@@ -1,0 +1,6 @@
+{
+    "name": "posbunga/app",
+    "require": {
+        "dompdf/dompdf": "^3.1"
+    }
+}
