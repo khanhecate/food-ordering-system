@@ -1,10 +1,10 @@
 <?php
 $host = 'db';
-$user = 'posbunga';
-$pass = 'posbunga123';
-$db   = 'posbunga';
+$user = 'tokoonline';
+$pass = 'tokoonline123';
+$db   = 'tokoonline';
 
-echo "<h1>PosBunga - PHP + MariaDB</h1>";
+echo "<h1>Toko Online - PHP + MariaDB</h1>";
 
 try {
     $pdo = new PDO("mysql:host=$host;dbname=$db", $user, $pass);

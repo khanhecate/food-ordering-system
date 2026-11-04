@@ -1,5 +1,5 @@
 {
-    "name": "posbunga/app",
+    "name": "tokoonline/app",
     "require": {
         "dompdf/dompdf": "^3.1"
     }

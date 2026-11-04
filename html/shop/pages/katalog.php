@@ -16,15 +16,15 @@
         ?>
         <section class="hero" style="<?php echo $heroStyle; ?>">
             <div class="container">
-                <h1 style="color:inherit;"><?php echo htmlspecialchars($_settings['hero_title'] ?? 'Bunga Segar untuk Setiap Momen'); ?></h1>
-                <p style="color:inherit;opacity:0.85;"><?php echo htmlspecialchars($_settings['hero_subtitle'] ?? 'Pilih dari koleksi bunga terbaik kami, langsung dari kebun ke tangan Anda'); ?></p>
+                <h1 style="color:inherit;"><?php echo htmlspecialchars($_settings['hero_title'] ?? 'Belanja Mudah, Sampai Cepat'); ?></h1>
+                <p style="color:inherit;opacity:0.85;"><?php echo htmlspecialchars($_settings['hero_subtitle'] ?? 'Pilih dari koleksi produk terbaik kami, langsung dikirim ke tangan Anda'); ?></p>
             </div>
         </section>
 
         <!-- Filter & Search -->
         <section class="container filter-section">
             <div class="filter-bar">
-                <input type="text" id="search-input" placeholder="Cari bunga..." class="search-input">
+                <input type="text" id="search-input" placeholder="Cari produk..." class="search-input">
                 <div class="kategori-filter">
                     <button class="filter-btn active" data-kategori="">Semua</button>
                 </div>
@@ -65,8 +65,8 @@
 
     <!-- Custom Order CTA (separate box) -->
     <div class="cta-box">
-        <p>Butuh custom made bunga?</p>
-        <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $_settings['no_telp_toko'] ?? ''); ?>?text=Halo%2C%20saya%20mau%20order%20bunga%20custom" class="btn-whatsapp" target="_blank">
+        <p>Butuh pesanan custom?</p>
+        <a href="https://wa.me/<?php echo preg_replace('/[^0-9]/', '', $_settings['no_telp_toko'] ?? ''); ?>?text=Halo%2C%20saya%20mau%20order%20custom" class="btn-whatsapp" target="_blank">
             <img src="/assets/wa-icon.png" alt="" onerror="this.style.display='none'" style="height:16px;vertical-align:middle;margin-right:4px;">Contact via WhatsApp
         </a>
     </div>

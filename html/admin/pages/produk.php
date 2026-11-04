@@ -204,8 +204,8 @@ if (isset($_GET['edit'])) {
         <form method="POST" enctype="multipart/form-data">
             <input type="hidden" name="id" id="form-id" value="">
             <div class="form-grid">
-                <div class="form-group"><label>Kode Bunga</label><input type="text" name="kode_bunga" id="form-kode" required placeholder="BNG-013"></div>
-                <div class="form-group"><label>Nama Bunga</label><input type="text" name="nama_bunga" id="form-nama" required placeholder="Mawar Merah"></div>
+                <div class="form-group"><label>Kode Produk</label><input type="text" name="kode_bunga" id="form-kode" required placeholder="PRD-013"></div>
+                <div class="form-group"><label>Nama Produk</label><input type="text" name="nama_bunga" id="form-nama" required placeholder="Nama produk"></div>
                 <div class="form-group"><label>Kategori</label>
                     <select name="kategori_id" id="form-kategori" required>
                         <option value="">-- Pilih --</option>

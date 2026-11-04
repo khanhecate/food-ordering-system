@@ -62,7 +62,7 @@ $themeLight = lightenColor($themeColor, 88);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin - POS Toko Bunga</title>
+    <title>Admin - Toko Online</title>
     <link rel="stylesheet" href="css/admin.css">
     <style>
         :root {

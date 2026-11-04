@@ -1,5 +1,5 @@
 // ==========================================
-// POS Toko Bunga - Frontend JS
+// Toko Online - Frontend JS
 // ==========================================
 
 const API_URL = '/api'; // path relatif dari root web server

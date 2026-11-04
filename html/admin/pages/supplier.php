@@ -379,7 +379,7 @@ function openPODetail(poId) {
             document.getElementById('po-print-area').innerHTML = `
                 <div style="font-family:monospace;padding:20px;max-width:600px;margin:0 auto;">
                     <h2 style="text-align:center;margin-bottom:5px;">PURCHASE ORDER</h2>
-                    <p style="text-align:center;margin-bottom:20px;color:#666;">Toko Bunga Melati</p>
+                    <p style="text-align:center;margin-bottom:20px;color:#666;">Toko Online</p>
                     <hr>
                     <p><strong>No. PO:</strong> ${po.no_pembelian}</p>
                     <p><strong>Supplier:</strong> ${po.supplier_nama}</p>

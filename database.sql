@@ -1,7 +1,7 @@
 /*M!999999\- enable the sandbox mode */ 
 -- MariaDB dump 10.19  Distrib 10.11.18-MariaDB, for debian-linux-gnu (aarch64)
 --
--- Host: localhost    Database: posbunga
+-- Host: localhost    Database: tokoonline
 -- ------------------------------------------------------
 -- Server version	10.11.18-MariaDB-ubu2204
 
@@ -277,8 +277,8 @@ CREATE TABLE `pengaturan` (
 LOCK TABLES `pengaturan` WRITE;
 /*!40000 ALTER TABLE `pengaturan` DISABLE KEYS */;
 INSERT INTO `pengaturan` VALUES
-(1,'nama_toko','Toko Bunga Melati','2026-07-17 10:37:28'),
-(2,'alamat_toko','Jl. Bunga Indah No. 123, Jakarta','2026-07-16 14:04:44'),
+(1,'nama_toko','Toko Online','2026-07-17 10:37:28'),
+(2,'alamat_toko','Jl. Contoh No. 123, Jakarta','2026-07-16 14:04:44'),
 (3,'no_telp_toko','021-12345678','2026-07-16 14:04:44'),
 (4,'pajak_persen','30','2026-07-17 10:39:22'),
 (5,'stok_minimum_alert','5','2026-07-16 14:04:44'),
@@ -286,8 +286,8 @@ INSERT INTO `pengaturan` VALUES
 (12,'tema_warna','','2026-07-17 10:37:19'),
 (13,'mata_uang','Rp','2026-07-17 10:37:19'),
 (14,'footer_struk','','2026-07-17 10:37:19'),
-(31,'hero_title','Bunga Segar untuk Setiap Momen','2026-07-17 11:09:30'),
-(32,'hero_subtitle','Bunga segar dipetik dari belakang rumah','2026-07-17 11:22:20'),
+(31,'hero_title','Belanja Mudah, Sampai Cepat','2026-07-17 11:09:30'),
+(32,'hero_subtitle','Pilih dari koleksi produk terbaik kami, langsung dikirim ke tangan Anda','2026-07-17 11:22:20'),
 (33,'hero_bg','hero_bg.jpeg','2026-07-17 11:22:01'),
 (40,'hero_text_color','#ffffff','2026-07-17 11:25:54');
 /*!40000 ALTER TABLE `pengaturan` ENABLE KEYS */;

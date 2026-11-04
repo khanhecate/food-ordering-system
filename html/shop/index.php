@@ -7,7 +7,7 @@ $db = getDB();
 $_settings = [];
 $_sRows = $db->query("SELECT setting_key, setting_value FROM pengaturan")->fetchAll();
 foreach ($_sRows as $_r) { $_settings[$_r['setting_key']] = $_r['setting_value']; }
-$_namaToko = $_settings['nama_toko'] ?? 'Toko Bunga Melati';
+$_namaToko = $_settings['nama_toko'] ?? 'Toko Online';
 $_logoToko = $_settings['logo_toko'] ?? '';
 
 // Router

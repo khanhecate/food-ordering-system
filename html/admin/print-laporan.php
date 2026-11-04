@@ -18,7 +18,7 @@ $db = getDB();
 $_settings = [];
 $rows = $db->query("SELECT setting_key, setting_value FROM pengaturan")->fetchAll();
 foreach ($rows as $r) { $_settings[$r['setting_key']] = $r['setting_value']; }
-$namaToko = $_settings['nama_toko'] ?? 'Toko Bunga';
+$namaToko = $_settings['nama_toko'] ?? 'Toko Online';
 
 // Params
 $tab = $_GET['tab'] ?? 'overview';

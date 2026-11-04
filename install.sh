@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 #
-# install.sh — Installer untuk project "posbunga" (food/flower ordering system) di Ubuntu
+# install.sh — Installer untuk project "tokoonline" (toko online / POS) di Ubuntu
 #
 # Menginstall Apache2, PHP, MariaDB, Composer, membuat database dari database.sql,
 # dan mengatur virtual host agar project langsung bisa diakses lewat browser.
@@ -14,12 +14,12 @@ set -euo pipefail
 # ---------------------------------------------------------------------------
 # Konfigurasi (sesuaikan bila perlu)
 # ---------------------------------------------------------------------------
-DB_NAME="posbunga"
-DB_USER="posbunga"
-DB_PASS="posbunga123"
-DB_ROOT_PASS="posbunga_root123"   # password root MariaDB yang akan DI-SET oleh script ini
+DB_NAME="tokoonline"
+DB_USER="tokoonline"
+DB_PASS="tokoonline123"
+DB_ROOT_PASS="tokoonline_root123"   # password root MariaDB yang akan DI-SET oleh script ini
 
-APP_DOMAIN="posbunga.local"  # ServerName virtual host Apache
+APP_DOMAIN="tokoonline.local"  # ServerName virtual host Apache
 APACHE_PORT="80"
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -176,7 +176,7 @@ chmod -R 775 "${DOC_ROOT}/assets/produk"
 # ---------------------------------------------------------------------------
 # 9. Setup Apache Virtual Host
 # ---------------------------------------------------------------------------
-VHOST_FILE="/etc/apache2/sites-available/posbunga.conf"
+VHOST_FILE="/etc/apache2/sites-available/tokoonline.conf"
 log "Membuat virtual host Apache di ${VHOST_FILE}..."
 
 cat > "${VHOST_FILE}" <<VHOST
@@ -190,12 +190,12 @@ cat > "${VHOST_FILE}" <<VHOST
         Require all granted
     </Directory>
 
-    ErrorLog \${APACHE_LOG_DIR}/posbunga-error.log
-    CustomLog \${APACHE_LOG_DIR}/posbunga-access.log combined
+    ErrorLog \${APACHE_LOG_DIR}/tokoonline-error.log
+    CustomLog \${APACHE_LOG_DIR}/tokoonline-access.log combined
 </VirtualHost>
 VHOST
 
-a2ensite posbunga.conf
+a2ensite tokoonline.conf
 a2dissite 000-default.conf 2>/dev/null || true
 
 systemctl restart apache2

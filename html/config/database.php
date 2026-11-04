@@ -1,9 +1,9 @@
 <?php
 // Database Configuration
 define('DB_HOST', 'db');          // service name dari docker-compose
-define('DB_NAME', 'posbunga');
-define('DB_USER', 'posbunga');
-define('DB_PASS', 'posbunga123');
+define('DB_NAME', 'tokoonline');
+define('DB_USER', 'tokoonline');
+define('DB_PASS', 'tokoonline123');
 define('DB_PORT', '3306');
 
 function getDB() {

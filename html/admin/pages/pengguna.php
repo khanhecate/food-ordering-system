@@ -143,7 +143,7 @@ $currentTheme = $settings['tema_warna'] ?? '#e91e63';
         <div class="form-grid">
             <div class="form-group">
                 <label>Nama Toko</label>
-                <input type="text" name="nama_toko" value="<?php echo htmlspecialchars($settings['nama_toko'] ?? ''); ?>" placeholder="Toko Bunga Melati">
+                <input type="text" name="nama_toko" value="<?php echo htmlspecialchars($settings['nama_toko'] ?? ''); ?>" placeholder="Toko Online">
             </div>
             <div class="form-group">
                 <label>No. Telepon</label>
@@ -226,7 +226,7 @@ $currentTheme = $settings['tema_warna'] ?? '#e91e63';
                 <input type="hidden" name="action" value="update_hero_text">
                 <div class="form-group" style="margin-bottom:12px;">
                     <label>Judul Hero</label>
-                    <input type="text" name="hero_title" value="<?php echo htmlspecialchars($settings['hero_title'] ?? 'Bunga Segar untuk Setiap Momen'); ?>" placeholder="Judul utama banner">
+                    <input type="text" name="hero_title" value="<?php echo htmlspecialchars($settings['hero_title'] ?? 'Belanja Mudah, Sampai Cepat'); ?>" placeholder="Judul utama banner">
                 </div>
                 <div class="form-group" style="margin-bottom:12px;">
                     <label>Subtitle Hero</label>
