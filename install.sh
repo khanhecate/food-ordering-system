@@ -9,6 +9,12 @@
 #   chmod +x install.sh
 #   sudo ./install.sh
 #
+# Bisa dijalankan berulang:
+#   - Project selalu diinstall di /var/www/html (APP_DIR), dari mana pun script dijalankan.
+#   - Jika /var/www/html sudah berisi project, kode di-update (git pull), database TIDAK ditimpa.
+#   - Jika kosong (atau hanya halaman default Apache), project di-clone dari GitHub.
+#   - Untuk menimpa database dengan database.sql: sudo FORCE_DB_IMPORT=1 ./install.sh
+#
 set -euo pipefail
 
 # ---------------------------------------------------------------------------
@@ -22,11 +28,21 @@ DB_ROOT_PASS="tokoonline_root123"   # password root MariaDB yang akan DI-SET ole
 APP_DOMAIN="tokoonline.local"  # ServerName virtual host Apache
 APACHE_PORT="80"
 
-PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-DOC_ROOT="${PROJECT_ROOT}/html"
-SQL_FILE="${PROJECT_ROOT}/database.sql"
+REPO_URL="https://github.com/khanhecate/food-ordering-system.git"
+REPO_BRANCH="main"
+APP_DIR="/var/www/html"         # lokasi instalasi project (repo di-clone/di-update di sini)
+
+# Set FORCE_DB_IMPORT=1 untuk menimpa database dengan database.sql (HAPUS data lama!)
+FORCE_DB_IMPORT="${FORCE_DB_IMPORT:-0}"
 
 PHP_VERSION="8.3"
+
+# Project SELALU diinstall di APP_DIR (/var/www/html), dari mana pun script dijalankan.
+# DocumentRoot Apache hanya subfolder html/ (jadi .git, database.sql, install.sh tidak bisa diakses publik).
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${APP_DIR}"
+DOC_ROOT="${PROJECT_ROOT}/html"
+SQL_FILE="${PROJECT_ROOT}/database.sql"
 
 # ---------------------------------------------------------------------------
 # Helper
@@ -40,11 +56,6 @@ if [[ "${EUID}" -ne 0 ]]; then
   exit 1
 fi
 
-if [[ ! -f "${SQL_FILE}" ]]; then
-  err "Tidak menemukan database.sql di ${SQL_FILE}"
-  exit 1
-fi
-
 # ---------------------------------------------------------------------------
 # 1. Update sistem & install dependency dasar
 # ---------------------------------------------------------------------------
@@ -52,13 +63,62 @@ log "Update package list..."
 apt-get update -y
 
 log "Install software-properties-common & curl..."
-apt-get install -y software-properties-common curl ca-certificates lsb-release apt-transport-https gnupg2
+apt-get install -y software-properties-common curl git ca-certificates lsb-release apt-transport-https gnupg2
 
 # Repo ondrej/php untuk versi PHP yang lebih baru (Ubuntu default kadang tidak sesuai)
 if ! grep -rq "ondrej/php" /etc/apt/sources.list.d/ 2>/dev/null; then
   log "Menambahkan repository ondrej/php..."
   add-apt-repository -y ppa:ondrej/php
   apt-get update -y
+fi
+
+# ---------------------------------------------------------------------------
+# 1b. Sinkronisasi kode: clone jika folder kosong, update (git pull) jika sudah ada isi
+# ---------------------------------------------------------------------------
+# Folder biasanya milik www-data (hasil chown), jadi izinkan git root membacanya
+GIT=(git -c "safe.directory=${PROJECT_ROOT}" -C "${PROJECT_ROOT}")
+
+# Hapus halaman default Apache jika itu satu-satunya isi folder (agar dianggap kosong)
+if [[ -f "${PROJECT_ROOT}/index.html" && ! -d "${PROJECT_ROOT}/.git" && ! -d "${PROJECT_ROOT}/html" ]] \
+   && grep -q "Apache2 Ubuntu Default Page" "${PROJECT_ROOT}/index.html" 2>/dev/null \
+   && [[ "$(ls -A "${PROJECT_ROOT}" | wc -l)" -eq 1 ]]; then
+  log "Menghapus halaman default Apache di ${PROJECT_ROOT}..."
+  rm -f "${PROJECT_ROOT}/index.html"
+fi
+
+if [[ "${SCRIPT_DIR}" != "${PROJECT_ROOT}" ]]; then
+  log "Project akan diinstall di ${PROJECT_ROOT} (script dijalankan dari ${SCRIPT_DIR})."
+fi
+
+if [[ -d "${PROJECT_ROOT}/.git" ]]; then
+  log "Project sudah ada di ${PROJECT_ROOT}, update kode (git pull)..."
+  # config/database.php diubah oleh script ini (DB_HOST=localhost); kembalikan dulu agar pull tidak konflik
+  "${GIT[@]}" -c core.fileMode=false checkout -- html/config/database.php 2>/dev/null || true
+  if ! "${GIT[@]}" -c core.fileMode=false pull --ff-only origin "${REPO_BRANCH}"; then
+    err "git pull gagal (ada perubahan lokal yang konflik?). Periksa dengan: git -C ${PROJECT_ROOT} status"
+    exit 1
+  fi
+elif [[ -d "${PROJECT_ROOT}/html" && -f "${PROJECT_ROOT}/database.sql" ]]; then
+  warn "Project ada di ${PROJECT_ROOT} tapi bukan git repository, kode tidak bisa di-update otomatis. Lanjut dengan kode yang ada."
+elif [[ -d "${PROJECT_ROOT}" && -n "$(ls -A "${PROJECT_ROOT}" 2>/dev/null)" ]]; then
+  err "Folder ${PROJECT_ROOT} sudah berisi file lain dan bukan project ini. Kosongkan atau ganti APP_DIR."
+  exit 1
+else
+  log "Folder ${PROJECT_ROOT} kosong, clone dari ${REPO_URL}..."
+  mkdir -p "$(dirname "${PROJECT_ROOT}")"
+  git clone --branch "${REPO_BRANCH}" "${REPO_URL}" "${PROJECT_ROOT}"
+fi
+
+if [[ ! -f "${SQL_FILE}" ]]; then
+  err "Tidak menemukan database.sql di ${SQL_FILE}"
+  exit 1
+fi
+
+# Pindahan dari lokasi lama: salin file upload (foto produk, avatar, dll) yang tidak ada di git.
+# -n = tidak menimpa file yang sudah ada.
+if [[ "${SCRIPT_DIR}" != "${PROJECT_ROOT}" && -d "${SCRIPT_DIR}/html/assets" ]]; then
+  log "Menyalin file upload dari ${SCRIPT_DIR}/html/assets ke ${DOC_ROOT}/assets (tanpa menimpa)..."
+  cp -an "${SCRIPT_DIR}/html/assets/." "${DOC_ROOT}/assets/"
 fi
 
 # ---------------------------------------------------------------------------
@@ -144,8 +204,14 @@ GRANT ALL PRIVILEGES ON \`${DB_NAME}\`.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 SQL
 
-log "Import database.sql ke database '${DB_NAME}'..."
-"${MYSQL_ROOT_CMD[@]}" "${DB_NAME}" < "${SQL_FILE}"
+TABLE_COUNT="$("${MYSQL_ROOT_CMD[@]}" -N -e "SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='${DB_NAME}'")"
+if [[ "${TABLE_COUNT}" -gt 0 && "${FORCE_DB_IMPORT}" != "1" ]]; then
+  log "Database '${DB_NAME}' sudah berisi ${TABLE_COUNT} tabel, skip import (data aman)."
+  log "Untuk menimpa dengan database.sql: sudo FORCE_DB_IMPORT=1 ./install.sh"
+else
+  log "Import database.sql ke database '${DB_NAME}'..."
+  "${MYSQL_ROOT_CMD[@]}" "${DB_NAME}" < "${SQL_FILE}"
+fi
 
 # ---------------------------------------------------------------------------
 # 6. Sesuaikan config/database.php agar host = localhost (bukan 'db' ala docker)
@@ -172,6 +238,17 @@ chown -R www-data:www-data "${PROJECT_ROOT}"
 find "${DOC_ROOT}" -type d -exec chmod 755 {} \;
 find "${DOC_ROOT}" -type f -exec chmod 644 {} \;
 chmod -R 775 "${DOC_ROOT}/assets/produk"
+
+# Apache (www-data) harus bisa melewati (execute/traverse) SEMUA folder induk.
+# Di Ubuntu, home directory default 750 sehingga project di /home/<user>/...
+# menghasilkan error 403 Forbidden. Tambahkan izin traverse (o+x) ke tiap induk.
+log "Memastikan Apache bisa melewati folder induk ${PROJECT_ROOT}..."
+parent="$(dirname "${PROJECT_ROOT}")"
+while [[ "${parent}" != "/" ]]; do
+  chmod o+x "${parent}"
+  parent="$(dirname "${parent}")"
+done
+chmod o+x "${PROJECT_ROOT}"
 
 # ---------------------------------------------------------------------------
 # 9. Setup Apache Virtual Host

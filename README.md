@@ -17,6 +17,11 @@ cd food-ordering-system
 sudo ./install.sh
 ```
 
+Dari folder mana pun script dijalankan, aplikasi selalu diinstall di **`/var/www/html`**
+(repo di-clone ke sana). Folder hasil clone awal boleh dihapus setelah instalasi selesai.
+Apache hanya melayani subfolder `/var/www/html/html`, sehingga `.git`, `database.sql`
+dan `install.sh` tidak bisa diakses dari web.
+
 ### Yang dikerjakan script
 
 1. Install Apache2, PHP 8.3 (PPA ondrej) beserta ekstensi yang dibutuhkan, MariaDB, dan Composer
@@ -25,7 +30,7 @@ sudo ./install.sh
 4. Ubah `DB_HOST` di `html/config/database.php` dari `db` menjadi `localhost`
 5. Jalankan `composer install` di folder `html/` (dompdf)
 6. Atur ownership dan permission, termasuk folder upload `html/assets/produk`
-7. Buat virtual host Apache `tokoonline.local` dengan document root `html/`
+7. Buat virtual host Apache `tokoonline.local` dengan document root `/var/www/html/html`
 
 ### Akses aplikasi
 
@@ -71,16 +76,27 @@ Variabel yang bisa diubah di bagian atas `install.sh`:
 | `DB_ROOT_PASS` | Password root MariaDB yang akan di-set |
 | `APP_DOMAIN` | ServerName virtual host Apache |
 | `APACHE_PORT` | Port Apache |
+| `APP_DIR` | Lokasi instalasi project (default `/var/www/html`) |
 | `PHP_VERSION` | Versi PHP yang diinstall |
 
-### Menjalankan ulang
+### Update / menjalankan ulang
 
-Script aman dijalankan ulang. Jika root MariaDB sudah memakai password yang
-dikonfigurasi, langkah set password dilewati. Jika root memakai password lain,
-script berhenti dan meminta `DB_ROOT_PASS` disesuaikan.
+Script aman dijalankan ulang untuk meng-update aplikasi:
 
-Perhatian: `database.sql` memakai `DROP TABLE IF EXISTS`, jadi menjalankan ulang
-script akan **menimpa data database** dengan isi dump.
+- Jika `/var/www/html` sudah berisi project, script menjalankan `git pull` (kode di-update).
+- Jika `/var/www/html` kosong atau hanya berisi halaman default Apache, project di-clone dari GitHub.
+- Jika sebelumnya kamu menjalankan script dari folder lain (misalnya di home), file upload di
+  `html/assets` dari folder lama disalin ke `/var/www/html/html/assets` tanpa menimpa file yang ada.
+- Jika database `tokoonline` sudah berisi tabel, `database.sql` **tidak di-import ulang**, jadi data aman.
+- Jika root MariaDB sudah memakai password yang dikonfigurasi, langkah set password dilewati.
+  Jika root memakai password lain, script berhenti dan meminta `DB_ROOT_PASS` disesuaikan.
+- Lokasi instalasi bisa diubah lewat variabel `APP_DIR` di bagian atas `install.sh`.
+
+Untuk sengaja menimpa database dengan isi `database.sql` (**semua data lama hilang**):
+
+```bash
+sudo FORCE_DB_IMPORT=1 ./install.sh
+```
 
 ## Instalasi manual
 
@@ -94,7 +110,7 @@ script akan **menimpa data database** dengan isi dump.
    ```
 3. Set `DB_HOST` di `html/config/database.php` ke `localhost`
 4. Install dependency: `cd html && composer install`
-5. Arahkan document root web server ke folder `html/` dan beri hak tulis ke `html/assets/produk` untuk user web server (`www-data`)
+5. Letakkan project di `/var/www/html`, arahkan document root web server ke subfolder `html/` (`/var/www/html/html`) dan beri hak tulis ke `html/assets/produk` untuk user web server (`www-data`)
 
 ## Catatan
 
