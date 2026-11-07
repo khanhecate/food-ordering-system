@@ -136,3 +136,23 @@ nama dan kode produk biasa — tidak memengaruhi penggunaan aplikasi.
 
 `html/config/database.php` memakai `DB_HOST = 'db'` (nama service di docker-compose).
 Jika memakai Docker, jangan jalankan `install.sh` karena script mengubah host ke `localhost`.
+
+Untuk development lokal, pakai `docker-compose.yml`:
+
+```bash
+docker compose up -d
+```
+
+| Layanan | URL |
+| --- | --- |
+| Shop | `http://localhost:8080/shop/` |
+| Admin | `http://localhost:8080/admin/` |
+| phpMyAdmin | `http://localhost:8081` (root / `root123`) |
+
+`database.sql` otomatis diimpor saat volume database pertama kali dibuat. Kalau database
+sudah ada dan perlu data baru, jalankan `tambah-produk.sql`, atau reset dengan
+`docker compose down -v` (**menghapus semua data database**).
+
+Catatan: `docker-compose.yml` ini untuk development. Port database (3306) dan phpMyAdmin
+(8081) terbuka dengan password default, jangan dipakai di server publik. Laporan PDF
+(dompdf) tidak jalan di mode ini karena tidak ada composer/gd/zip.

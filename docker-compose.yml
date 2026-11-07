@@ -1,0 +1,51 @@
+services:
+  web:
+    image: php:8.2-apache
+    container_name: foodorder-web
+    ports:
+      - "8080:80"
+    volumes:
+      - ./html:/var/www/html
+    depends_on:
+      - db
+    environment:
+      - APACHE_DOCUMENT_ROOT=/var/www/html
+    # No custom build: install the DB extensions + enable rewrite at startup,
+    # then hand off to the normal Apache entrypoint. NOTE: dompdf/PDF report
+    # (admin/pdf-laporan.php) will not work in this mode (no composer/gd/zip).
+    command: >
+      bash -c "docker-php-ext-install pdo pdo_mysql mysqli >/dev/null 2>&1;
+      a2enmod rewrite >/dev/null 2>&1;
+      exec docker-php-entrypoint apache2-foreground"
+    restart: unless-stopped
+
+  db:
+    image: mariadb:10.11
+    container_name: foodorder-db
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: root123
+      MARIADB_DATABASE: tokoonline
+      MARIADB_USER: tokoonline
+      MARIADB_PASSWORD: tokoonline123
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./database.sql:/docker-entrypoint-initdb.d/database.sql:ro
+    restart: unless-stopped
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: foodorder-pma
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root123
+    depends_on:
+      - db
+    restart: unless-stopped
+
+volumes:
+  db_data:
