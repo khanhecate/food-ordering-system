@@ -521,6 +521,36 @@ INSERT INTO `users` VALUES
 (3,'kayu','$2y$10$EribnVNRbYI935RiedP5o.VR6xrRlj1AiVpUxXjOWOPmM.LAlpCl.','kayu',NULL,'kasir','08888111111','Belakang','Kebon',1,'2026-07-25 05:41:14','2026-07-25 05:41:33');
 /*!40000 ALTER TABLE `users` ENABLE KEYS */;
 UNLOCK TABLES;
+--
+-- Kategori dan produk makanan (sumber: tambah-produk.sql)
+--
+INSERT IGNORE INTO `kategori_produk` (`nama_kategori`, `deskripsi`)
+VALUES ('Makanan', 'Aneka camilan dan makanan siap saji');
+
+INSERT INTO `produk` (`kode_bunga`, `nama_bunga`, `kategori_id`, `harga_beli`, `harga_jual`, `stok`, `foto`, `deskripsi`, `is_active`)
+SELECT v.kode, v.nama, k.id, v.beli, v.jual, v.stok, v.foto, v.deskripsi, 1
+FROM `kategori_produk` k
+JOIN (
+  SELECT 'MKN-001' AS kode, 'Bruleebomb' AS nama, 12000.00 AS beli, 20000.00 AS jual, 50 AS stok,
+         'bruleebomb.jpg' AS foto, 'Bruleebomb' AS deskripsi
+  UNION ALL
+  SELECT 'MKN-002', 'Chicken Cordon Bleu', 12000.00, 20000.00, 50,
+         'chicken-cordon-bleu.jpg', 'Chicken cordon bleu'
+  UNION ALL
+  SELECT 'MKN-003', 'Lumpia Kornet Mozzarella', 10000.00, 18000.00, 50,
+         'lumpia-kornet-mozzarella.jpg', 'Lumpia isi kornet dan mozzarella'
+  UNION ALL
+  SELECT 'MKN-004', 'Pizza Springroll', 10000.00, 18000.00, 50,
+         'pizza-springroll.jpg', 'Springroll isi pizza'
+) v
+WHERE k.`nama_kategori` = 'Makanan'
+ON DUPLICATE KEY UPDATE
+  `nama_bunga` = VALUES(`nama_bunga`),
+  `foto` = VALUES(`foto`),
+  `kategori_id` = VALUES(`kategori_id`),
+  `deskripsi` = VALUES(`deskripsi`),
+  `is_active` = 1;
+
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;

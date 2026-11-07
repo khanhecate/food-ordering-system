@@ -98,6 +98,19 @@ Untuk sengaja menimpa database dengan isi `database.sql` (**semua data lama hila
 sudo FORCE_DB_IMPORT=1 ./install.sh
 ```
 
+## Menambah produk contoh ke server yang sudah terinstall
+
+`install.sh` tidak mengimpor ulang `database.sql` kalau database sudah berisi data.
+Untuk menambah kategori "Makanan" dan 4 produk contoh (Bruleebomb, Chicken Cordon Bleu,
+Lumpia Kornet Mozzarella, Pizza Springroll) tanpa menyentuh data lain:
+
+```bash
+cd /var/www/html && sudo git -c safe.directory=/var/www/html pull
+sudo mysql tokoonline < /var/www/html/tambah-produk.sql
+```
+
+File ini aman dijalankan berulang. Harga dan stok awalnya contoh, ubah lewat admin panel (Data Produk).
+
 ## Instalasi manual
 
 1. Install Apache, PHP 8.3 (ekstensi: mysql, mbstring, xml, curl, gd, zip, bcmath), MariaDB, Composer
